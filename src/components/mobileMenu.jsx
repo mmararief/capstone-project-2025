@@ -30,6 +30,12 @@ function MobileMenu() {
             <a href="#about" className="text-lg font-medium transition-colors hover:text-green-800" onClick={closeMenu}>
               About
             </a>
+            <a href="#search" className="text-lg font-medium transition-colors hover:text-green-800" onClick={closeMenu}>
+              Search
+            </a>
+            <a href="#gallery" className="text-lg font-medium transition-colors hover:text-green-800" onClick={closeMenu}>
+              Gallery
+            </a>
             <a
               href="#contact"
               className="text-lg font-medium transition-colors hover:text-green-800"
@@ -37,7 +43,7 @@ function MobileMenu() {
             >
               Contact
             </a>
-            <button className="mt-4 bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-md w-full max-w-xs">
+            <button className="bg-[#1A3636] hover:bg-[#40534C] text-white px-4 py-2 rounded-md transition-colors">
               Sign Up
             </button>
           </nav>
