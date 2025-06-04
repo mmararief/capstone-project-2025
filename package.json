@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.js",
+    "seed": "node prisma/seed.js",
+    "export-csv": "node src/utils/exportToCsv.js",
+    "import-csv": "node src/utils/importPlacesFromCsv.js",
+    "import-users": "node src/utils/importUsersFromRatingCsv.js",
+    "migrate-reset-import": "npx prisma migrate reset --force --skip-seed && node src/utils/importPlacesFromCsv.js && node src/utils/importUsersFromRatingCsv.js && node src/utils/importRatingsFromCsv.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^6.8.2",
+    "zod": "^3.25.32"
+  }
+}
