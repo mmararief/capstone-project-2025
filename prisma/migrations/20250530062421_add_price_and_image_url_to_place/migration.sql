@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Place" ADD COLUMN     "image_url" TEXT DEFAULT '',
+ADD COLUMN     "price" DOUBLE PRECISION DEFAULT 0;

@@ -1,0 +1,365 @@
+openapi: 3.0.0
+info:
+  title: Wisata Jakarta API
+  version: 1.1.0
+  description: API untuk aplikasi wisata Jakarta (user, tempat wisata, rating, rekomendasi, import/export data)
+
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        preferences:
+          type: array
+          items:
+            type: string
+    Place:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        price:
+          type: number
+        image_url:
+          type: string
+    Rating:
+      type: object
+      properties:
+        id:
+          type: integer
+        value:
+          type: integer
+        userId:
+          type: integer
+        placeId:
+          type: integer
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      summary: Register user baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                preferences:
+                  type: array
+                  items:
+                    type: string
+                age:
+                  type: integer
+      responses:
+        "200":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /places:
+    get:
+      summary: List semua tempat wisata
+      responses:
+        "200":
+          description: List of places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+    post:
+      summary: Tambah tempat wisata baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Place"
+      responses:
+        "201":
+          description: Tempat wisata berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+
+  /places/{id}:
+    get:
+      summary: Detail tempat wisata (termasuk ratings)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Detail tempat wisata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+    put:
+      summary: Update data tempat wisata
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Place"
+      responses:
+        "200":
+          description: Tempat wisata berhasil diupdate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+    delete:
+      summary: Hapus tempat wisata
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Tempat wisata berhasil dihapus
+
+  /places/{id}/rate:
+    post:
+      summary: Beri rating pada tempat wisata
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: integer
+      responses:
+        "200":
+          description: Rating berhasil diberikan/diupdate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+
+  /recommend/db-check:
+    get:
+      summary: Cek status database pada service rekomendasi
+      responses:
+        "200":
+          description: Status database
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /recommend/by_place:
+    get:
+      summary: Rekomendasi berdasarkan tempat
+      parameters:
+        - in: query
+          name: place_id
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: top_n
+          schema:
+            type: integer
+          required: false
+          description: Jumlah rekomendasi (default 5)
+      responses:
+        "200":
+          description: Rekomendasi tempat wisata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+
+  /recommend/by_user:
+    get:
+      summary: Rekomendasi collaborative berdasarkan user
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: top_n
+          schema:
+            type: integer
+          required: false
+          description: Jumlah rekomendasi (default 5)
+      responses:
+        "200":
+          description: Rekomendasi tempat wisata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+
+  /recommend/by_hybrid:
+    get:
+      summary: Rekomendasi hybrid berdasarkan user
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: top_n
+          schema:
+            type: integer
+          required: false
+          description: Jumlah rekomendasi (default 5)
+      responses:
+        "200":
+          description: Rekomendasi tempat wisata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+
+  /recommend/nearby:
+    get:
+      summary: Rekomendasi tempat wisata terdekat
+      parameters:
+        - in: query
+          name: lat
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: lon
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: top_n
+          schema:
+            type: integer
+          required: false
+          description: Jumlah rekomendasi (default 5)
+      responses:
+        "200":
+          description: Tempat wisata terdekat
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"
+
+  /recommend/by_category:
+    get:
+      summary: Rekomendasi berdasarkan kategori
+      parameters:
+        - in: query
+          name: categories
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: top_n
+          schema:
+            type: integer
+          required: false
+          description: Jumlah rekomendasi (default 5)
+      responses:
+        "200":
+          description: Tempat wisata berdasarkan kategori
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Place"

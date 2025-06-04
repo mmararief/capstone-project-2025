@@ -1,0 +1,6 @@
+"id","name","description","category","latitude","longitude","price","image_url"
+1,"Candi Borobudur","Candi Buddha terbesar di dunia yang terletak di Magelang.","Budaya",-7.6079,110.2038,50000,"https://example.com/borobudur.jpg"
+2,"Pantai Kuta","Pantai terkenal di Bali dengan pemandangan matahari terbenam.","Alam",-8.7177,115.1682,25000,"https://example.com/kuta.jpg"
+3,"Taman Mini Indonesia Indah","Taman budaya yang mewakili kebudayaan Indonesia dari Sabang sampai Merauke.","Budaya",-6.3026,106.8956,30000,"https://example.com/tmii.jpg"
+4,"Gunung Bromo","Gunung berapi aktif dan tempat wisata alam di Jawa Timur.","Alam",-7.9425,112.953,40000,"https://example.com/bromo.jpg"
+5,"Nama Tempat","Deskripsi","Alam",-7,110,10000,"https://example.com/tempat.jpg"

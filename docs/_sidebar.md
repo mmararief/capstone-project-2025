@@ -1,0 +1,5 @@
+- [Beranda](README.md)
+- [Panduan Umum](guide.md)
+- [Autentikasi](endpoints/auth.md)
+- [Tempat Wisata](endpoints/places.md)
+- [Rekomendasi](endpoints/recommend.md)
