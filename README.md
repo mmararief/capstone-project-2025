@@ -1,63 +1,33 @@
-# Capstone Project 2025 - Sistem Rekomendasi Tempat Wisata Jakarta
+# Wisata Jakarta Recommendation API
 
-Proyek capstone ini adalah sistem rekomendasi tempat wisata Jakarta yang terdiri dari komponen Machine Learning untuk rekomendasi dan aplikasi Frontend-Backend untuk antarmuka pengguna.
+API ini memberikan rekomendasi tempat wisata di Jakarta berbasis content-based filtering.
 
-## 📁 Struktur Proyek
+## Setup
 
-```
-capstone-project-2025/
-├── ML/                     # Machine Learning Components
-│   ├── Api-Rekomendasi/   # API Rekomendasi FastAPI
-│   ├── Dataset/           # Dataset dan data processing
-│   └── Notebook/          # Jupyter notebooks untuk eksperimen
-├── FE-BE/                 # Frontend & Backend Application
-└── README.md              # Dokumentasi utama
-```
+1. **Install dependencies**
 
-## 🎯 Tujuan Proyek
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Mengembangkan sistem rekomendasi tempat wisata Jakarta yang dapat:
+2. **Pastikan database PostgreSQL berjalan dan sudah terisi data**
 
-- Memberikan rekomendasi tempat wisata berdasarkan preferensi pengguna
-- Mencari tempat wisata berdasarkan kategori
-- Menampilkan tempat wisata terpopuler
-- Memberikan rekomendasi berdasarkan lokasi geografis
+   - Connection string default: `postgresql://postgres:postgres@localhost:5433/wisata_jakarta`
+   - Struktur tabel sesuai dengan model User, Place, Rating (lihat skema di atas)
 
-## 🛠️ Teknologi yang Digunakan
+3. **Pastikan file model ML tersedia di folder `models_ml/`**
 
-### Machine Learning
+   - `cosine_similarity_matrix.joblib`
+   - `place_indices.joblib`
+   - `tfidf_vectorizer.joblib`
 
-- **FastAPI**: API framework untuk machine learning service
-- **Scikit-learn**: Content-based filtering dengan TF-IDF dan Cosine Similarity
-- **Pandas & NumPy**: Data processing dan manipulasi
-- **Joblib**: Model serialization
+4. **Jalankan API**
+   ```bash
+   uvicorn main:app --reload
+   ```
 
-### Frontend & Backend
+## Endpoint
 
-- _[Akan diisi sesuai teknologi yang digunakan]_
-
-## 🚀 Quick Start
-
-### 1. Machine Learning API
-
-```bash
-cd ML/Api-Rekomendasi
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-### 2. Frontend & Backend
-
-```bash
-cd FE-BE
-# [Instruksi akan ditambahkan sesuai teknologi yang digunakan]
-```
-
-## 📖 Dokumentasi Detail
-
-- [ML - Machine Learning Components](./ML/README.md)
-- [FE-BE - Frontend & Backend](./FE-BE/README.md)
-
-## 👥 Tim Pengembang
-
-_[Tambahkan informasi tim pengembang]_
+- `GET /recommend/place/{place_id}?top_n=5`
+  - Mengembalikan rekomendasi tempat wisata mirip berdasarkan `place_id`.
+  - Response: List tempat wisata (id, name, category, description, latitude, longitude, price, image_url)
