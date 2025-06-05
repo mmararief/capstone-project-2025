@@ -1,68 +1,114 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react"; 
+import axios from "axios";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"; 
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export default function Search() {
+  const [allAttractions, setAllAttractions] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // State untuk pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(6); 
+
   const categories = [
-    "All",
-    "Cultural & Heritage",
-    "Urban & Modern",
-    "Nature & Recreation",
+    "Budaya",
+    "Taman Hiburan",
+    "Cagar Alam",
+    "Bahari",
+    "Tempat Ibadah",
+    "Pusat Perbelanjaan"
   ];
 
-  const attractions = [
-    {
-      id: 1,
-      name: "National Monument (Monas)",
-      image: "/monas.jpg",
-      description:
-        "Discover Jakarta's iconic landmark and enjoy panoramic city views from the top.",
-      category: "Cultural & Heritage",
-      price: "Rp 20.000",
-    },
-    {
-      id: 2,
-      name: "Kota Tua Jakarta",
-      image: "/kotatua.jpg",
-      description:
-        "Step back in time with this historic area featuring colonial architecture and museums.",
-      category: "Cultural & Heritage",
-      price: "Free",
-    },
-    {
-      id: 3,
-      name: "Grand Indonesia Mall",
-      image: "/mallgi.jpeg",
-      description:
-        "Shop, dine, and enjoy entertainment at one of Jakarta’s largest modern malls.",
-      category: "Urban & Modern",
-      price: "Free Entry",
-    },
-    {
-      id: 4,
-      name: "Taman Mini Indonesia Indah",
-      image: "/tmii.jpeg",
-      description:
-        "Explore Indonesia’s diverse culture in one vast recreational park.",
-      category: "Nature & Recreation",
-      price: "Rp 30.000",
-    },
-  ];
+  useEffect(() => {
+    const fetchAttractions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        if (!API_BASE_URL) {
+          throw new Error("Konfigurasi API base URL tidak ditemukan.");
+        }
+        const response = await axios.get(`${API_BASE_URL}/places`); 
+        setAllAttractions(response.data);
+      } catch (err) {
+        console.error("Error fetching attractions:", err);
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Gagal memuat daftar atraksi. Silakan coba lagi nanti."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const filteredAttractions = attractions.filter((item) => {
+    fetchAttractions();
+  }, []);
+
+  const filteredAttractions = allAttractions.filter((item) => {
     const matchCategory =
       activeCategory === "All" || item.category === activeCategory;
-    const matchSearch = item.name
-      .toLowerCase()
+    const matchSearch = item.name 
       .includes(searchTerm.toLowerCase());
     return matchCategory && matchSearch;
   });
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeCategory]);
+
+  const totalPages = Math.ceil(filteredAttractions.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentDisplayAttractions = filteredAttractions.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    const halfPagesToShow = Math.floor(maxPagesToShow / 2);
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+    } else {
+      pageNumbers.push(1);
+      let startPage = Math.max(2, currentPage - halfPagesToShow);
+      let endPage = Math.min(totalPages - 1, currentPage + halfPagesToShow);
+      if (currentPage - halfPagesToShow <= 2) endPage = Math.min(totalPages - 1, maxPagesToShow - 1);
+      if (currentPage + halfPagesToShow >= totalPages - 1) startPage = Math.max(2, totalPages - (maxPagesToShow - 2));
+      if (startPage > 2) pageNumbers.push("ellipsis_start");
+      for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
+      if (endPage < totalPages - 1) pageNumbers.push("ellipsis_end");
+      pageNumbers.push(totalPages);
+    }
+    return pageNumbers;
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-6xl mx-auto px-4 py-10 min-h-screen"> 
       {/* Search Bar */}
       <div className="mb-10">
         <input
@@ -96,35 +142,99 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Attraction Cards */}
-      <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredAttractions.map((attraction) => (
-          <div
-            key={attraction.id}
-            className="relative group border-4 border-[#D6BD98] rounded-3xl shadow-xl hover:shadow-2xl shadow-[#1A3636]/30 overflow-hidden transform transition duration-300 hover:scale-105 flex flex-col bg-[#1A3636]"
-            style={{ minHeight: "320px" }}
-          >
-            <img
-              src={attraction.image || "/placeholder.svg"}
-              alt={attraction.name}
-              className="w-full h-60 object-cover object-center"
-            />
-            <div className="flex-1 flex flex-col justify-end">
-              <div className="p-6 bg-[#1A3636] bg-opacity-90 rounded-b-3xl">
-                <h3 className="text-2xl font-bold text-[#D6BD98] mb-2 text-center drop-shadow-lg">
-                  {attraction.name}
-                </h3>
-                <p className="text-[#E6FFFA] text-base text-center">
-                  {attraction.description}
-                </p>
-                <p className="text-[#D6BD98] text-base text-center font-semibold mt-2">
-                  {attraction.price}
-                </p>
-              </div>
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-10">
+          <p className="text-xl text-[#1A3636]">Loading attractions...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="max-w-2xl mx-auto text-center py-10 p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <h3 className="text-2xl font-semibold mb-2">Oops! Something went wrong.</h3>
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {/* Attraction Cards & No Results */}
+      {!isLoading && !error && (
+        <>
+          {filteredAttractions.length === 0 ? (
+            <div className="text-center py-10">
+                <p className="text-xl text-[#40534C]">No attractions found matching your criteria.</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ) : (
+            <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {currentDisplayAttractions.map((attraction) => ( 
+                <div
+                  key={attraction.id}
+                  className="relative group border-4 border-[#D6BD98] rounded-3xl shadow-xl hover:shadow-2xl shadow-[#1A3636]/30 overflow-hidden transform transition duration-300 hover:scale-105 flex flex-col bg-[#1A3636]"
+                  style={{ minHeight: "320px" }}
+                >
+                  <img
+                    src={attraction.image_url || "/placeholder.svg"} 
+                    alt={attraction.name}
+                    className="w-full h-60 object-cover object-center" 
+                  />
+                  <div className="flex-1 flex flex-col justify-end"> 
+                    <div className="p-6 bg-[#1A3636] bg-opacity-90 rounded-b-3xl"> 
+                      <h3 className="text-2xl font-bold text-[#D6BD98] mb-2 text-center drop-shadow-lg">
+                        {attraction.name}
+                      </h3>
+                      <p className="text-[#E6FFFA] text-base text-center line-clamp-3"> 
+                        {attraction.description}
+                      </p>
+                      <p className="text-[#D6BD98] text-base text-center font-semibold mt-2">
+                        {typeof attraction.price === 'number' ? `Rp ${attraction.price.toLocaleString('id-ID')}` : attraction.price}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Component */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  {getPageNumbers().map((page, index) => (
+                    <PaginationItem key={typeof page === 'string' ? `${page}-${index}` : page}>
+                      {typeof page === 'string' ? (
+                        <PaginationEllipsis />
+                      ) : (
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
+                          isActive={currentPage === page}
+                        >
+                          {page}
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

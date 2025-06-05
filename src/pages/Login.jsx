@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Login() {
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  // const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target; // DIPERBAIKI: Hanya destructure yang digunakan
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -53,10 +54,16 @@ export default function Login() {
 
       if (responseData && responseData.token) {
         localStorage.setItem("authToken", responseData.token);
-        setSuccessMessage("Login successful! Redirecting...");
+        setSuccessMessage("Login successful! Redirecting to gallery..."); 
         console.log("Login successful, token:", responseData.token);
         setFormData({ email: "", password: "" });
+
+        setTimeout(() => {
+          navigate("/gallery");
+        }, 1500);
+
       } else {
+
         throw new Error("Login failed: Invalid response from server.");
       }
     } catch (err) {
@@ -72,12 +79,10 @@ export default function Login() {
         setError("Login failed. No response from server. Please try again.");
         console.error("Login error (request):", err.request);
       } else {
-        setError("Login failed. An unexpected error occurred.");
-        console.error("Login error (message):", err.message);
+        setError(err.message || "Login failed. An unexpected error occurred.");
+        console.error("Login error (general):", err.message);
       }
-      if (error.toLowerCase().includes("token")) { // Pastikan 'error' di sini merujuk ke state
-        setError("Login failed. Please check your credentials.");
-      }
+
     } finally {
       setIsLoading(false);
     }
@@ -156,7 +161,7 @@ export default function Login() {
               Remember me
             </label>
             <a
-              href="#"
+              href="#" // Ganti dengan link ke halaman lupa password jika ada
               className="text-[#677D6A] hover:underline font-medium"
             >
               Forgot password?
@@ -174,7 +179,7 @@ export default function Login() {
           <p className="text-sm text-center text-[#40534C]">
             Don’t have an account?{" "}
             <a
-              href="/register"
+              href="/register" 
               className="text-[#677D6A] font-medium hover:underline"
             >
               Sign up
