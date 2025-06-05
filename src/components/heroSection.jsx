@@ -33,29 +33,7 @@ function HeroSection() {
           </p>
 
           {/* Tombol aksi */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-            <button
-              className="bg-[#1A3636] hover:bg-[#1D4044] text-white px-10 py-3 rounded-lg font-medium text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#285E61]/40 flex items-center justify-center gap-2"
-              onClick={() => navigate("/login")}
-            >
-              {/* Login icon: user */}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Log In
-            </button>
-            <button
-              className="border-2 border-[#D6BD98] text-[#E6FFFA] hover:bg-[#1A3636]/70 px-10 py-3 rounded-lg font-medium text-lg transition-all duration-300 flex items-center justify-center gap-2"
-              onClick={() => navigate("/signup")}
-            >
-              {/* Sign up icon: user-plus */}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 14v6m3-3h-6m-2-5a4 4 0 11-8 0 4 4 0 018 0zm6 4a4 4 0 00-8 0" />
-              </svg>
-              Sign Up
-            </button>
-          </div>
+          
         </div>
       </div>
 

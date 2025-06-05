@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/signup";
 import GalleryPage from "./pages/GalleryPage";
 import HomePage from "./pages/homepage";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/info" element={<HeroSection />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/about" element={<AboutSection />} />

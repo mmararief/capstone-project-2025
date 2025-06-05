@@ -4,7 +4,6 @@ function HomePage() {
   const backgroundImage = "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80";
   return (
     <section className="relative flex-1">
-      {/* Background image and overlay */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <img
           src={backgroundImage}
@@ -28,7 +27,6 @@ function HomePage() {
           </p>
         </div>
       </div>
-      {/* Bottom gradient effect */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#1A3636] to-transparent z-20"></div>
     </section>
   );
