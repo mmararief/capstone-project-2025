@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Pagination,
@@ -10,12 +10,14 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"; 
+} from "@/components/ui/pagination";
+import { Link } from "react-router-dom";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export default function Search() {
-  const [allAttractions, setAllAttractions] = useState([]); 
+  const [allPlaces, setAllPlaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,7 +26,7 @@ export default function Search() {
 
   // State untuk pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6); 
+  const [itemsPerPage] = useState(6);
 
   const categories = [
     "Budaya",
@@ -32,21 +34,21 @@ export default function Search() {
     "Cagar Alam",
     "Bahari",
     "Tempat Ibadah",
-    "Pusat Perbelanjaan"
+    "Pusat Perbelanjaan",
   ];
 
   useEffect(() => {
-    const fetchAttractions = async () => {
+    const fetchPlaces = async () => {
       setIsLoading(true);
       setError(null);
       try {
         if (!API_BASE_URL) {
           throw new Error("Konfigurasi API base URL tidak ditemukan.");
         }
-        const response = await axios.get(`${API_BASE_URL}/places`); 
-        setAllAttractions(response.data);
+        const response = await axios.get(`${API_BASE_URL}/places`);
+        setAllPlaces(response.data);
       } catch (err) {
-        console.error("Error fetching attractions:", err);
+        console.error("Error fetching Places:", err);
         setError(
           err.response?.data?.message ||
             err.message ||
@@ -57,14 +59,13 @@ export default function Search() {
       }
     };
 
-    fetchAttractions();
+    fetchPlaces();
   }, []);
 
-  const filteredAttractions = allAttractions.filter((item) => {
+  const filteredPlaces = allPlaces.filter((item) => {
     const matchCategory =
       activeCategory === "All" || item.category === activeCategory;
-    const matchSearch = item.name 
-      .includes(searchTerm.toLowerCase());
+    const matchSearch = item.name.includes(searchTerm.toLowerCase());
     return matchCategory && matchSearch;
   });
 
@@ -72,10 +73,10 @@ export default function Search() {
     setCurrentPage(1);
   }, [searchTerm, activeCategory]);
 
-  const totalPages = Math.ceil(filteredAttractions.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredPlaces.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentDisplayAttractions = filteredAttractions.slice(
+  const currentDisplayPlaces = filteredPlaces.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
@@ -97,8 +98,10 @@ export default function Search() {
       pageNumbers.push(1);
       let startPage = Math.max(2, currentPage - halfPagesToShow);
       let endPage = Math.min(totalPages - 1, currentPage + halfPagesToShow);
-      if (currentPage - halfPagesToShow <= 2) endPage = Math.min(totalPages - 1, maxPagesToShow - 1);
-      if (currentPage + halfPagesToShow >= totalPages - 1) startPage = Math.max(2, totalPages - (maxPagesToShow - 2));
+      if (currentPage - halfPagesToShow <= 2)
+        endPage = Math.min(totalPages - 1, maxPagesToShow - 1);
+      if (currentPage + halfPagesToShow >= totalPages - 1)
+        startPage = Math.max(2, totalPages - (maxPagesToShow - 2));
       if (startPage > 2) pageNumbers.push("ellipsis_start");
       for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
       if (endPage < totalPages - 1) pageNumbers.push("ellipsis_end");
@@ -108,7 +111,7 @@ export default function Search() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 min-h-screen"> 
+    <div className="max-w-6xl mx-auto px-4 py-10 min-h-screen">
       {/* Search Bar */}
       <div className="mb-10">
         <input
@@ -145,52 +148,59 @@ export default function Search() {
       {/* Loading State */}
       {isLoading && (
         <div className="text-center py-10">
-          <p className="text-xl text-[#1A3636]">Loading attractions...</p>
+          <p className="text-xl text-[#1A3636]">Loading Places...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && !isLoading && (
         <div className="max-w-2xl mx-auto text-center py-10 p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-          <h3 className="text-2xl font-semibold mb-2">Oops! Something went wrong.</h3>
+          <h3 className="text-2xl font-semibold mb-2">
+            Oops! Something went wrong.
+          </h3>
           <p>{error}</p>
         </div>
       )}
-      
-      {/* Attraction Cards & No Results */}
+
+      {/* Place Cards & No Results */}
       {!isLoading && !error && (
         <>
-          {filteredAttractions.length === 0 ? (
+          {filteredPlaces.length === 0 ? (
             <div className="text-center py-10">
-                <p className="text-xl text-[#40534C]">No attractions found matching your criteria.</p>
+              <p className="text-xl text-[#40534C]">
+                No Places found matching your criteria.
+              </p>
             </div>
           ) : (
             <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {currentDisplayAttractions.map((attraction) => ( 
-                <div
-                  key={attraction.id}
-                  className="relative group border-4 border-[#D6BD98] rounded-3xl shadow-xl hover:shadow-2xl shadow-[#1A3636]/30 overflow-hidden transform transition duration-300 hover:scale-105 flex flex-col bg-[#1A3636]"
-                  style={{ minHeight: "320px" }}
-                >
-                  <img
-                    src={attraction.image_url || "/placeholder.svg"} 
-                    alt={attraction.name}
-                    className="w-full h-60 object-cover object-center" 
-                  />
-                  <div className="flex-1 flex flex-col justify-end"> 
-                    <div className="p-6 bg-[#1A3636] bg-opacity-90 rounded-b-3xl"> 
-                      <h3 className="text-2xl font-bold text-[#D6BD98] mb-2 text-center drop-shadow-lg">
-                        {attraction.name}
-                      </h3>
-                      <p className="text-[#E6FFFA] text-base text-center line-clamp-3"> 
-                        {attraction.description}
-                      </p>
-                      <p className="text-[#D6BD98] text-base text-center font-semibold mt-2">
-                        {typeof attraction.price === 'number' ? `Rp ${attraction.price.toLocaleString('id-ID')}` : attraction.price}
-                      </p>
+              {currentDisplayPlaces.map((Place) => (
+                <Link to={`/places/${Place.id}`} key={Place.id}>
+                  <div
+                    className="relative group border-4 border-[#D6BD98] rounded-3xl shadow-xl hover:shadow-2xl shadow-[#1A3636]/30 overflow-hidden transform transition duration-300 hover:scale-105 flex flex-col bg-[#1A3636]"
+                    style={{ minHeight: "320px" }}
+                  >
+                    <img
+                      src={Place.image_url || "/placeholder.svg"}
+                      alt={Place.name}
+                      className="w-full h-60 object-cover object-center"
+                    />
+                    <div className="flex-1 flex flex-col justify-end">
+                      <div className="p-6 bg-[#1A3636] bg-opacity-90 rounded-b-3xl">
+                        <h3 className="text-2xl font-bold text-[#D6BD98] mb-2 text-center drop-shadow-lg">
+                          {Place.name}
+                        </h3>
+                        <p className="text-[#E6FFFA] text-base text-center line-clamp-3">
+                          {Place.description}
+                        </p>
+                        <p className="text-[#D6BD98] text-base text-center font-semibold mt-2">
+                          {typeof Place.price === "number"
+                            ? `Rp ${Place.price.toLocaleString("id-ID")}`
+                            : Place.price}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -203,18 +213,30 @@ export default function Search() {
                   <PaginationItem>
                     <PaginationPrevious
                       href="#"
-                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage - 1);
+                      }}
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
                     />
                   </PaginationItem>
                   {getPageNumbers().map((page, index) => (
-                    <PaginationItem key={typeof page === 'string' ? `${page}-${index}` : page}>
-                      {typeof page === 'string' ? (
+                    <PaginationItem
+                      key={typeof page === "string" ? `${page}-${index}` : page}
+                    >
+                      {typeof page === "string" ? (
                         <PaginationEllipsis />
                       ) : (
                         <PaginationLink
                           href="#"
-                          onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
                           isActive={currentPage === page}
                         >
                           {page}
@@ -225,8 +247,15 @@ export default function Search() {
                   <PaginationItem>
                     <PaginationNext
                       href="#"
-                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(currentPage + 1);
+                      }}
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>

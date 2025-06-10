@@ -9,6 +9,7 @@ import SignUp from "./pages/signup";
 import GalleryPage from "./pages/GalleryPage";
 import HomePage from "./pages/homepage";
 import Register from "./pages/Register";
+import DetailPage from "./pages/detailPage";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/about" element={<AboutSection />} />
           <Route path="/homepage" element={<HomePage />} />
+          <Route path="/detailpage" element={<DetailPage />} />
+          <Route path="/places/:id" element={<DetailPage />} />
         </Routes>
         <Footer />
       </div>
