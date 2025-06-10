@@ -24,9 +24,10 @@ exports.ratePlace = async (req, res, next) => {
 
     let rating;
     if (existingRating) {
-      rating = await prisma.rating.update({
-        where: { id: existingRating.id },
-        data: { value },
+      // User has already rated this place
+      return res.status(200).json({
+        message: "You have already rated this place.",
+        rating: existingRating,
       });
     } else {
       rating = await prisma.rating.create({
@@ -39,6 +40,19 @@ exports.ratePlace = async (req, res, next) => {
     }
 
     res.json(rating);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserRatings = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const ratings = await prisma.rating.findMany({
+      where: { userId },
+      include: { place: true },
+    });
+    res.json(ratings);
   } catch (err) {
     next(err);
   }

@@ -16,7 +16,8 @@
     "latitude": -6.2,
     "longitude": 106.8,
     "price": 10000,
-    "image_url": "https://..."
+    "image_url": "https://...",
+    "avgRating": 4.2
   }
 ]
 ```
@@ -38,9 +39,14 @@
   "latitude": -6.2,
   "longitude": 106.8,
   "price": 10000,
-  "image_url": "https://..."
+  "image_url": "https://...",
+  "avgRating": 4.2,
+  "userRating": 5
 }
 ```
+
+- `avgRating`: Rata-rata rating dari semua user untuk tempat ini.
+- `userRating`: Rating yang diberikan user yang sedang login (null jika belum pernah memberi rating).
 
 ---
 
