@@ -1,9 +1,8 @@
 import MobileMenu from "./mobileMenu"; // Pastikan path ini benar
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   // Cek status login dari localStorage (menggunakan 'authToken' yang kita simpan sebelumnya)

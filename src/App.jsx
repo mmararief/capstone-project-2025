@@ -3,13 +3,12 @@ import Navbar from "./components/navbar";
 import HeroSection from "./components/heroSection";
 import AboutSection from "./components/Layout/aboutSection";
 import Footer from "./components/Layout/footer";
-import Search from "./pages/Search";
-import Login from "./pages/Login";
-import SignUp from "./pages/signup";
-import GalleryPage from "./pages/GalleryPage";
-import HomePage from "./pages/homepage";
-import Register from "./pages/Register";
-import DetailPage from "./pages/detailPage";
+import Search from "./pages/Destination/Search";
+import Login from "./pages/Auth/Login";
+import GalleryPage from "./pages/Destination/GalleryPage";
+import HomePage from "./pages/Landing/homepage";
+import Register from "./pages/Auth/Register";
+import DetailPage from "./pages/Destination/detailPage";
 
 function App() {
   return (
@@ -30,7 +29,6 @@ function App() {
           <Route path="/info" element={<HeroSection />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/signup" element={<SignUp />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/about" element={<AboutSection />} />
           <Route path="/homepage" element={<HomePage />} />
