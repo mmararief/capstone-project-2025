@@ -1,3 +1,5 @@
+// src/components/Navbar.jsx
+
 import MobileMenu from "./mobileMenu"; // Pastikan path ini benar
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -5,24 +7,20 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
 
-  // Cek status login dari localStorage (menggunakan 'authToken' yang kita simpan sebelumnya)
+  // Cek status login dari localStorage
   const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem("authToken");
 
-  // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // Hapus token saat logout
-    // Anda mungkin juga ingin menghapus item lain yang berkaitan dengan sesi pengguna
-    // localStorage.removeItem("userData"); // misalnya
-    navigate("/"); // Arahkan ke halaman utama setelah logout
-    // Untuk me-refresh state navbar, bisa juga dengan me-reload halaman jika diperlukan,
-    // namun idealnya state management (seperti Context API atau Redux) menangani ini.
-    // Untuk contoh sederhana, navigate dan perubahan state isLoggedIn sudah cukup memicu re-render.
+    localStorage.removeItem("authToken");
+    // Juga hapus userData agar sapaan di halaman rekomendasi hilang
+    localStorage.removeItem("userData"); 
+    navigate("/");
+    window.location.reload(); // Reload untuk memastikan state di semua komponen ter-update
   };
 
-  // Scroll to footer when Contact is clicked
   const handleFooterScroll = (e) => {
     e.preventDefault();
-    const footer = document.querySelector("footer"); // Pastikan elemen footer ada di halaman
+    const footer = document.querySelector("footer");
     if (footer) {
       footer.scrollIntoView({ behavior: "smooth" });
     }
@@ -33,75 +31,63 @@ function Navbar() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <img src="logo2.png" alt="logo" className="h-12 w-auto mr-3" />
+          <img src="/logo2.png" alt="logo" className="h-12 w-auto mr-3" /> {/* Pastikan path logo benar */}
           <span className="text-lg font-medium text-[#1A3636]">
             Explore Jakarta
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 text-sm"> {/* Mengurangi gap sedikit untuk ruang tombol */}
-          <Link
-            to="/"
-            className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
-          >
+        <nav className="hidden md:flex items-center gap-6 text-sm">
+          {/* Link yang selalu tampil */}
+          <Link to="/" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
             Home
           </Link>
-          <Link
-            to="/search"
-            className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
-          >
+          <Link to="/search" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
             Search
           </Link>
-          <Link
-            to="/about"
-            className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
-          >
-            About
-          </Link>
-          <a
-            href="#footer" // Pastikan ada elemen dengan id="footer"
-            className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
-            onClick={handleFooterScroll}
-          >
-            Contact
-          </a>
-          <Link
-            to="/gallery"
-            className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
-          >
-            Gallery
-          </Link>
 
-          {/* Tombol Login/Register atau Logout */}
+          {/* === KONTEN NAVBAR YANG BERUBAH BERDASARKAN LOGIN === */}
           {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="font-medium text-white bg-[#1A3636] hover:bg-[#40534C] px-4 py-2 rounded-lg transition-colors text-sm"
-            >
-              Logout
-            </button>
-          ) : (
+            // Tampilan SAAT SUDAH LOGIN
             <>
               <Link
-                to="/login"
-                className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A] px-3 py-2"
+                to="/nearby"
+                className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]"
               >
+                Nearby
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="font-medium text-white bg-[#D63447] hover:bg-[#b02a3a] px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            // Tampilan SAAT BELUM LOGIN
+            <>
+              <Link to="/about" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
+                About
+              </Link>
+              <a href="#footer" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]" onClick={handleFooterScroll}>
+                Contact
+              </a>
+              <Link to="/gallery" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
+                Gallery
+              </Link>
+              <Link to="/login" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A] px-3 py-2">
                 Login
               </Link>
-              <Link
-                to="/register"
-                className="font-medium text-white bg-[#1A3636] hover:bg-[#40534C] px-4 py-2 rounded-lg transition-colors text-sm"
-              >
+              <Link to="/register" className="font-medium text-white bg-[#1A3636] hover:bg-[#40534C] px-4 py-2 rounded-lg transition-colors text-sm">
                 Register
               </Link>
             </>
           )}
         </nav>
-
-        {/* Mobile Menu Tetap Membutuhkan Penyesuaian Serupa */}
-        {/* Anda perlu memodifikasi MobileMenu untuk juga menampilkan tombol Login/Register/Logout secara kondisional */}
-        <div className="md:hidden"> {/* Wrapper untuk MobileMenu agar tombol Login/Register di desktop tidak mempengaruhinya langsung */}
+        
+        <div className="md:hidden">
+            {/* Anda juga perlu menyesuaikan MobileMenu.jsx dengan logika yang sama */}
             <MobileMenu isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
         </div>
       </div>

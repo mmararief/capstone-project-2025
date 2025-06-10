@@ -1,3 +1,5 @@
+// src/components/mobileMenu.jsx
+
 "use client"
 
 import { useState } from "react"
@@ -42,51 +44,70 @@ function MobileMenu({ isLoggedIn, handleLogout }) {
             </button>
           </div>
 
-          <nav className="flex flex-col items-center gap-6 p-4 text-[#1A3636]">
+          <nav className="flex flex-col items-center gap-8 p-4 text-[#1A3636]">
+            {/* --- LINK YANG SELALU TAMPIL --- */}
             <Link to="/" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
               Home
-            </Link>
-            <Link to="/about" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
-              About
             </Link>
             <Link to="/search" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
               Search
             </Link>
-            <Link to="/gallery" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
-              Gallery
-            </Link>
-            <a
-              href="#footer"
-              onClick={handleFooterScroll}
-              className="text-lg font-medium hover:text-[#677D6A]"
-            >
-              Contact
-            </a>
 
+            {/* --- KONTEN MENU YANG BERUBAH BERDASARKAN LOGIN --- */}
             {isLoggedIn ? (
-              <button
-                onClick={handleLogoutClick}
-                className="bg-[#1A3636] hover:bg-[#40534C] text-white px-4 py-2 rounded-md transition-colors"
-              >
-                Logout
-              </button>
+              // Tampilan SAAT SUDAH LOGIN
+              <>
+                <Link
+                  to="/recommendations"
+                  onClick={handleLinkClick}
+                  className="text-lg font-medium text-[#1A3636] hover:text-[#677D6A]"
+                >
+                  Recommendation
+                </Link>
+                {/* Garis pemisah */}
+                <div className="w-1/2 border-b border-gray-200"></div>
+                <button
+                  onClick={handleLogoutClick}
+                  className="bg-[#D63447] hover:bg-[#b02a3a] text-white px-6 py-2 rounded-lg transition-colors w-full max-w-xs text-center"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
-              <div className="flex flex-col gap-2 w-full items-center">
-                <Link
-                  to="/login"
-                  onClick={handleLinkClick}
-                  className="text-[#1A3636] font-medium hover:text-[#677D6A]"
-                >
-                  Login
+              // Tampilan SAAT BELUM LOGIN
+              <>
+                <Link to="/about" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
+                  About
                 </Link>
-                <Link
-                  to="/register"
-                  onClick={handleLinkClick}
-                  className="bg-[#1A3636] hover:bg-[#40534C] text-white px-4 py-2 rounded-md transition-colors"
-                >
-                  Register
+                <Link to="/gallery" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
+                  Gallery
                 </Link>
-              </div>
+                <a
+                  href="#footer"
+                  onClick={handleFooterScroll}
+                  className="text-lg font-medium hover:text-[#677D6A]"
+                >
+                  Contact
+                </a>
+                {/* Garis pemisah */}
+                <div className="w-1/2 border-b border-gray-200"></div>
+                <div className="flex flex-col gap-4 w-full items-center">
+                  <Link
+                    to="/login"
+                    onClick={handleLinkClick}
+                    className="text-lg font-medium text-[#1A3636] hover:text-[#677D6A]"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={handleLinkClick}
+                    className="bg-[#1A3636] hover:bg-[#40534C] text-white px-6 py-2 rounded-lg transition-colors w-full max-w-xs text-center"
+                  >
+                    Register
+                  </Link>
+                </div>
+              </>
             )}
           </nav>
         </div>
@@ -95,4 +116,4 @@ function MobileMenu({ isLoggedIn, handleLogout }) {
   )
 }
 
-export default MobileMenu
+export default MobileMenu;

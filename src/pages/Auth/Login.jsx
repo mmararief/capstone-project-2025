@@ -59,7 +59,7 @@ export default function Login() {
         setFormData({ email: "", password: "" });
 
         setTimeout(() => {
-          navigate("/gallery");
+          navigate("/");
         }, 1500);
 
       } else {
@@ -177,7 +177,7 @@ export default function Login() {
           </button>
 
           <p className="text-sm text-center text-[#40534C]">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a
               href="/register" 
               className="text-[#677D6A] font-medium hover:underline"

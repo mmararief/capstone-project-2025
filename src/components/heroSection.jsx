@@ -1,9 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom"; // 1. Impor komponen Link
 
 function HeroSection() {
-  const navigate = useNavigate();
-
   return (
     <section className="relative flex-1">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -21,8 +19,9 @@ function HeroSection() {
         <div className="max-w-4xl text-center space-y-6">
           {/* Judul utama dengan warna aksen */}
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-            Discover Jakarta's <span className="text-[#D6BD98]">Heritage</span> —<br/>
-            Where <em className="text-[#D6BD98] not-italic font-semibold">Art</em>, 
+            Discover Jakarta's <span className="text-[#D6BD98]">Heritage</span> —
+            <br />
+            Where <em className="text-[#D6BD98] not-italic font-semibold">Art</em>,
             <em className="text-[#D6BD98] not-italic font-semibold"> Tradition</em>, and
             <em className="text-[#D6BD98] not-italic font-semibold"> Stories</em> Come Alive
           </h1>
@@ -32,7 +31,21 @@ function HeroSection() {
             Explore the rich cultural tapestry of Indonesia's capital through its historic landmarks and vibrant traditions.
           </p>
 
-          {/* Tombol aksi */}
+          {/* --- BAGIAN TOMBOL AKSI DITAMBAHKAN DI SINI --- */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/register"
+              className="inline-block w-full sm:w-auto px-8 py-3 font-bold text-[#1A3636] bg-[#D6BD98] rounded-lg shadow-lg hover:bg-[#c1a97c] transition-all duration-300 transform hover:scale-105"
+            >
+              Get Started
+            </Link>
+            <Link
+              to="/login"
+              className="inline-block w-full sm:w-auto px-8 py-3 font-bold text-white bg-transparent border-2 border-white rounded-lg hover:bg-white hover:text-[#1A3636] transition-colors duration-300"
+            >
+              Login
+            </Link>
+          </div>
           
         </div>
       </div>
