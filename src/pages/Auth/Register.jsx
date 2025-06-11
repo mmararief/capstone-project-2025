@@ -167,216 +167,171 @@ export default function Register() {
     }
   };
 
-  if (step === "complete" && registrationResult) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-6 w-6 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl">
-              Selamat Datang, {registrationResult.name}!
-            </CardTitle>
-            <CardDescription>
-              Akun Anda telah berhasil dibuat
-              dengan preferensi {registrationResult.preference}.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              className="w-full bg-teal-700 hover:bg-teal-800"
-              onClick={() => {
-                window.location.href = "/login";
-              }}
-            >
-              Login Sekarang
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+if (step === "complete" && registrationResult) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Create an Account</CardTitle>
-          <CardDescription>
-            Get started by filling out the form below.
+      <Card className="w-full max-w-md border border-[#D6BD98] shadow-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#D6BD98]/20">
+            <CheckCircle className="h-6 w-6 text-[#1A3636]" />
+          </div>
+          <CardTitle className="text-2xl text-[#1A3636]">
+            Selamat Datang, {registrationResult.name}!
+          </CardTitle>
+          <CardDescription className="text-[#40534C]">
+            Akun Anda telah berhasil dibuat dengan preferensi{" "}
+            <span className="font-semibold text-[#1A3636]">
+              {registrationResult.preference}
+            </span>.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && step === "form" && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleFormSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input
-                id="fullName"
-                value={formData.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                placeholder="John Doe"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="name@company.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  handleInputChange("confirmPassword", e.target.value)
-                }
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
-              <Input
-                id="age"
-                type="number"
-                value={formData.age}
-                onChange={(e) => handleInputChange("age", e.target.value)}
-                placeholder="20"
-                required
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-teal-700 hover:bg-teal-800"
-              disabled={isLoading && step === "form"}
-            >
-              {isLoading && step === "form" ? "Processing..." : "Next"}
-            </Button>
-          </form>
-
-          <div className="mt-4 text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              onClick={() => (window.location.href = "/login")}
-              className="text-teal-700 hover:underline"
-            >
-              Sign in
-            </button>
-          </div>
+          <Button
+            className="w-full bg-[#1A3636] hover:bg-[#40534C] text-white"
+            onClick={() => {
+              window.location.href = "/login";
+            }}
+          >
+            Login Sekarang
+          </Button>
         </CardContent>
       </Card>
-
-      <Dialog
-        open={showModal && step === "preferences"}
-        onOpenChange={(open) => {
-          if (step === "preferences") {
-            setShowModal(open);
-            if (!open && !isLoading) {
-              setStep("form");
-              setError("");
-            }
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Pilih Preferensi Anda</DialogTitle>
-            <DialogDescription>
-              Pilih satu preferensi yang paling sesuai dengan minat Anda.
-            </DialogDescription>
-          </DialogHeader>
-          {error && step === "preferences" && (
-            <Alert variant="destructive" className="my-2">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <div className="grid grid-cols-2 gap-3 py-4">
-            {preferences.map((preference) => {
-              const Icon = preference.icon;
-              return (
-                <button
-                  key={preference.id}
-                  onClick={() => handlePreferenceSelect(preference.id)}
-                  className={`p-4 rounded-lg border-2 transition-all hover:shadow-md ${
-                    selectedPreference === preference.id
-                      ? "border-teal-500 bg-teal-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  disabled={isLoading}
-                >
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <Icon
-                      className={`h-8 w-8 ${
-                        selectedPreference === preference.id
-                          ? "text-teal-600"
-                          : "text-gray-600"
-                      }`}
-                    />
-                    <div>
-                      <h3 className="font-medium text-sm">
-                        {preference.title}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {preference.description}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowModal(false);
-                setStep("form");
-                setError("");
-              }}
-              disabled={isLoading}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleCompleteRegistration}
-              disabled={!selectedPreference || isLoading}
-              className="bg-teal-700 hover:bg-teal-800"
-            >
-              {isLoading ? "Registering..." : "Selesai"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
+}
+
+return (
+  <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center px-4">
+    <Card className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-[#D6BD98]/30 p-8">
+      <CardHeader className="text-center px-0">
+        <CardTitle className="text-3xl font-bold text-[#1A3636]">Create Account</CardTitle>
+        <CardDescription className="text-sm text-[#40534C]">
+          Get started by filling the form below
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="px-0">
+        {error && step === "form" && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleFormSubmit} className="space-y-4">
+          {[
+            { id: "fullName", label: "Full Name", type: "text", placeholder: "John Doe" },
+            { id: "email", label: "Email Address", type: "email", placeholder: "name@company.com" },
+            { id: "password", label: "Password", type: "password", placeholder: "••••••••" },
+            { id: "confirmPassword", label: "Confirm Password", type: "password", placeholder: "••••••••" },
+            { id: "age", label: "Age", type: "number", placeholder: "20" },
+          ].map(({ id, label, type, placeholder }) => (
+            <div key={id}>
+              <label htmlFor={id} className="block mb-1 text-sm font-medium text-[#40534C]">
+                {label}
+              </label>
+              <input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                value={formData[id]}
+                onChange={(e) => handleInputChange(id, e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D6BD98] border-gray-300"
+              />
+            </div>
+          ))}
+          <Button
+            type="submit"
+            className="w-full bg-[#1A3636] hover:bg-[#40534C] text-white"
+            disabled={isLoading && step === "form"}
+          >
+            {isLoading && step === "form" ? "Processing..." : "Next"}
+          </Button>
+        </form>
+
+        <div className="mt-4 text-center text-sm text-[#40534C]">
+          Already have an account?{" "}
+          <button
+            onClick={() => (window.location.href = "/login")}
+            className="text-[#1A3636] hover:underline"
+          >
+            Sign in
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Modal Preferences */}
+    <Dialog
+      open={showModal && step === "preferences"}
+      onOpenChange={(open) => {
+        if (step === "preferences") {
+          setShowModal(open);
+          if (!open && !isLoading) {
+            setStep("form");
+            setError("");
+          }
+        }
+      }}
+    >
+      <DialogContent className="sm:max-w-md rounded-2xl border border-[#D6BD98]/30 shadow-lg">
+        <DialogHeader>
+          <DialogTitle className="text-[#1A3636] text-lg">Pilih Preferensi Anda</DialogTitle>
+          <DialogDescription className="text-[#40534C]">
+            Pilih satu preferensi yang paling sesuai dengan minat Anda.
+          </DialogDescription>
+        </DialogHeader>
+        {error && step === "preferences" && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm my-2">
+            {error}
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3 py-4">
+          {preferences.map(({ id, title, description, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => handlePreferenceSelect(id)}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                selectedPreference === id
+                  ? "border-[#D6BD98] bg-[#FAF9F7]"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+              disabled={isLoading}
+            >
+              <div className="flex flex-col items-center text-center space-y-2">
+                <Icon
+                  className={`h-6 w-6 ${
+                    selectedPreference === id ? "text-[#1A3636]" : "text-gray-600"
+                  }`}
+                />
+                <div>
+                  <h3 className="font-medium text-sm text-[#1A3636]">{title}</h3>
+                  <p className="text-xs text-[#40534C] mt-1">{description}</p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-end space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowModal(false);
+              setStep("form");
+              setError("");
+            }}
+            disabled={isLoading}
+          >
+            Batal
+          </Button>
+          <Button
+            onClick={handleCompleteRegistration}
+            disabled={!selectedPreference || isLoading}
+            className="bg-[#1A3636] hover:bg-[#40534C] text-white"
+          >
+            {isLoading ? "Registering..." : "Selesai"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </div>
+);
 } 

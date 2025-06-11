@@ -12,31 +12,38 @@ const MapDisplay = ({ place }) => {
       setLoading(true);
       setError(null);
 
+      // Jika nama tempat kosong atau terlalu pendek, langsung fallback ke Jakarta
+      if (!placeName || placeName.length < 3) {
+        setError('Nama tempat tidak valid, menampilkan peta Jakarta.');
+        setCoordinates({ lat: -6.2088, lon: 106.8456 });
+        return;
+      }
+
       // Using Nominatim API (OpenStreetMap) for geocoding
       const searchQuery = `${placeName}, Jakarta, Indonesia`;
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
       );
-      
       if (!response.ok) {
         throw new Error('Failed to fetch location data');
       }
-      
       const data = await response.json();
-      
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         const coords = { lat: parseFloat(lat), lon: parseFloat(lon) };
         setCoordinates(coords);
       } else {
-        throw new Error('Location not found');
+        // Tidak perlu log error di console, cukup fallback
+        setError('Lokasi tidak ditemukan, menampilkan peta Jakarta.');
+        setCoordinates({ lat: -6.2088, lon: 106.8456 });
       }
     } catch (err) {
-      console.error('Geocoding error:', err);
-      setError('Unable to find location on map');
-      // Fallback to Jakarta coordinates
-      const fallbackCoords = { lat: -6.2088, lon: 106.8456 };
-      setCoordinates(fallbackCoords);
+      // Tidak perlu log error di console kecuali di development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Geocoding error:', err);
+      }
+      setError('Gagal mencari lokasi, menampilkan peta Jakarta.');
+      setCoordinates({ lat: -6.2088, lon: 106.8456 });
     } finally {
       setLoading(false);
     }
@@ -215,4 +222,4 @@ const MapDisplay = ({ place }) => {
   );
 };
 
-export default MapDisplay; 
+export default MapDisplay;
