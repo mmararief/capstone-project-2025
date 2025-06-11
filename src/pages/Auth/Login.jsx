@@ -54,7 +54,7 @@ export default function Login() {
 
       if (responseData && responseData.token) {
         localStorage.setItem("authToken", responseData.token);
-        setSuccessMessage("Login successful! Redirecting to gallery..."); 
+        setSuccessMessage("Welcome back! Let’s explore your recommended destinations..."); 
         console.log("Login successful, token:", responseData.token);
         setFormData({ email: "", password: "" });
 
@@ -69,10 +69,7 @@ export default function Login() {
     } catch (err) {
       if (err.response) {
         setError(
-          err.response.data.message ||
-            `Error: ${err.response.status} - ${
-              err.response.statusText || "Unknown server error"
-            }`
+          "Login failed – double-check your username and password."
         );
         console.error("Login error (response):", err.response.data);
       } else if (err.request) {

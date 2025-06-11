@@ -1,4 +1,4 @@
-// src/components/mobileMenu.jsx
+// / src/components/mobileMenu.jsx
 
 "use client"
 
@@ -18,15 +18,6 @@ function MobileMenu({ isLoggedIn, handleLogout }) {
 
   const handleLogoutClick = () => {
     handleLogout()
-    closeMenu()
-  }
-
-  const handleFooterScroll = (e) => {
-    e.preventDefault()
-    const footer = document.querySelector("footer")
-    if (footer) {
-      footer.scrollIntoView({ behavior: "smooth" })
-    }
     closeMenu()
   }
 
@@ -52,17 +43,20 @@ function MobileMenu({ isLoggedIn, handleLogout }) {
             <Link to="/search" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
               Search
             </Link>
+            <Link to="/developer" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
+              Developer
+            </Link>
 
             {/* --- KONTEN MENU YANG BERUBAH BERDASARKAN LOGIN --- */}
             {isLoggedIn ? (
               // Tampilan SAAT SUDAH LOGIN
               <>
                 <Link
-                  to="/recommendations"
+                  to="/nearby"
                   onClick={handleLinkClick}
                   className="text-lg font-medium text-[#1A3636] hover:text-[#677D6A]"
                 >
-                  Recommendation
+                  Nearby
                 </Link>
                 {/* Garis pemisah */}
                 <div className="w-1/2 border-b border-gray-200"></div>
@@ -82,13 +76,6 @@ function MobileMenu({ isLoggedIn, handleLogout }) {
                 <Link to="/gallery" onClick={handleLinkClick} className="text-lg font-medium hover:text-[#677D6A]">
                   Gallery
                 </Link>
-                <a
-                  href="#footer"
-                  onClick={handleFooterScroll}
-                  className="text-lg font-medium hover:text-[#677D6A]"
-                >
-                  Contact
-                </a>
                 {/* Garis pemisah */}
                 <div className="w-1/2 border-b border-gray-200"></div>
                 <div className="flex flex-col gap-4 w-full items-center">

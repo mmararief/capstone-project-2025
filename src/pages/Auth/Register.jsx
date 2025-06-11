@@ -152,10 +152,7 @@ export default function Register() {
     } catch (err) {
       if (err.response) {
         setError(
-          err.response.data.message ||
-            `Error: ${err.response.status} - ${
-              err.response.statusText || "Terjadi kesalahan server"
-            }`
+          "Unable to complete registration. Make sure your email and username are not already registered."
         );
         console.error("Registration error (response):", err.response.data);
       } else if (err.request) {
