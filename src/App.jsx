@@ -1,8 +1,8 @@
 // src/App.js
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HeroSection from "./components/HeroSection";
-import AboutSection from "./components/Layout/AboutSection";
+import HeroSection from "./components/heroSection";
+import AboutSection from "./components/Layout/aboutSection";
 import Navbar from "./components/navbar";
 import Footer from "./components/Layout/footer";
 import Search from "./pages/Destination/Search";
