@@ -28,7 +28,7 @@ const DeveloperPage = () => {
       university: "Universitas Gunadarma",
       status: "Aktif",
       specialization: "Recommendation Systems",
-      avatar: "profile/miftah.png",
+      avatar: "profile/miftah2.png",
     },
     {
       id: "MC009D5Y1029",
