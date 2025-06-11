@@ -18,13 +18,7 @@ function Navbar() {
     window.location.reload(); // Reload untuk memastikan state di semua komponen ter-update
   };
 
-  const handleFooterScroll = (e) => {
-    e.preventDefault();
-    const footer = document.querySelector("footer");
-    if (footer) {
-      footer.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#D6BD98]/30 bg-white shadow-sm">
@@ -45,6 +39,9 @@ function Navbar() {
           </Link>
           <Link to="/search" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
             Search
+          </Link>
+          <Link to="/developer" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
+            Developer
           </Link>
 
           {/* === KONTEN NAVBAR YANG BERUBAH BERDASARKAN LOGIN === */}
@@ -70,9 +67,6 @@ function Navbar() {
               <Link to="/about" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
                 About
               </Link>
-              <a href="#footer" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]" onClick={handleFooterScroll}>
-                Contact
-              </a>
               <Link to="/gallery" className="font-medium text-[#1A3636] transition-colors hover:text-[#677D6A]">
                 Gallery
               </Link>

@@ -14,6 +14,7 @@ import DetailPage from "./pages/Destination/detailPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import MainPage from "./pages/Landing/MainPage";
 import NearbyPage from "./pages/Recommendation/NearbyPage";
+import DeveloperPage from "./pages/Developer/DeveloperPage";
 import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/about" element={<AboutSection />} />
+          <Route path="/developer" element={<DeveloperPage />} />
           <Route path="/homepage" element={<HomePage />} />
           <Route path="/detailpage" element={<DetailPage />} />
           <Route path="/places/:id" element={<DetailPage />} />

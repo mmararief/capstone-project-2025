@@ -12,6 +12,21 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Link } from "react-router-dom";
+import { 
+  Search as SearchIcon, 
+  Filter, 
+  Grid3X3, 
+  List, 
+  SortAsc, 
+  SortDesc, 
+  MapPin, 
+  Star,
+  Clock,
+  DollarSign,
+  Loader,
+  X,
+  Sliders
+} from "lucide-react";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -21,20 +36,34 @@ export default function Search() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Search and filter states
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // State untuk pagination
+  // View and pagination states
+  const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6);
+  const [itemsPerPage] = useState(viewMode === "grid" ? 9 : 12);
 
   const categories = [
+    "All",
     "Budaya",
-    "Taman Hiburan",
+    "Taman Hiburan", 
     "Cagar Alam",
     "Bahari",
     "Tempat Ibadah",
     "Pusat Perbelanjaan",
+  ];
+
+  const sortOptions = [
+    { value: "name", label: "Name" },
+    { value: "price", label: "Price" },
+    { value: "avgRating", label: "Rating" },
+    { value: "category", label: "Category" }
   ];
 
   useEffect(() => {
@@ -43,16 +72,26 @@ export default function Search() {
       setError(null);
       try {
         if (!API_BASE_URL) {
-          throw new Error("Konfigurasi API base URL tidak ditemukan.");
+          throw new Error("API configuration not found.");
         }
         const response = await axios.get(`${API_BASE_URL}/places`);
         setAllPlaces(response.data);
+        
+        // Set initial price range based on data
+        if (response.data.length > 0) {
+          const prices = response.data
+            .map(p => typeof p.price === "number" ? p.price : 0)
+            .filter(p => p > 0);
+          if (prices.length > 0) {
+            setPriceRange([0, Math.max(...prices)]);
+          }
+        }
       } catch (err) {
         console.error("Error fetching Places:", err);
         setError(
           err.response?.data?.message ||
             err.message ||
-            "Gagal memuat daftar atraksi. Silakan coba lagi nanti."
+            "Failed to load attractions. Please try again later."
         );
       } finally {
         setIsLoading(false);
@@ -62,29 +101,70 @@ export default function Search() {
     fetchPlaces();
   }, []);
 
+  // Enhanced filtering logic
   const filteredPlaces = allPlaces.filter((item) => {
-    const matchCategory =
-      activeCategory === "All" || item.category === activeCategory;
-    const matchSearch = item.name.includes(searchTerm.toLowerCase());
-    return matchCategory && matchSearch;
+    const matchCategory = activeCategory === "All" || item.category === activeCategory;
+    const matchSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       item.category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const itemPrice = typeof item.price === "number" ? item.price : 0;
+    const matchPrice = itemPrice >= priceRange[0] && itemPrice <= priceRange[1];
+    
+    return matchCategory && matchSearch && matchPrice;
   });
 
+  // Sorting logic
+  const sortedPlaces = [...filteredPlaces].sort((a, b) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+    
+    // Handle special cases
+    if (sortBy === "price") {
+      aValue = typeof a.price === "number" ? a.price : 0;
+      bValue = typeof b.price === "number" ? b.price : 0;
+    }
+    
+    if (sortBy === "avgRating") {
+      aValue = a.avgRating || 0;
+      bValue = b.avgRating || 0;
+    }
+    
+    if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+    
+    if (sortOrder === "asc") {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, activeCategory]);
+  }, [searchTerm, activeCategory, sortBy, sortOrder, priceRange, viewMode]);
 
-  const totalPages = Math.ceil(filteredPlaces.length / itemsPerPage);
+  // Pagination
+  const totalPages = Math.ceil(sortedPlaces.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentDisplayPlaces = filteredPlaces.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentDisplayPlaces = sortedPlaces.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setActiveCategory("All");
+    setSortBy("name");
+    setSortOrder("asc");
+    setPriceRange([0, Math.max(...allPlaces.map(p => typeof p.price === "number" ? p.price : 0))]);
   };
 
   const getPageNumbers = () => {
@@ -111,102 +191,342 @@ export default function Search() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 min-h-screen">
-      {/* Search Bar */}
-      <div className="mb-10">
-        <input
-          type="text"
-          placeholder="Search destinations..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-5 py-3 rounded-full border-2 border-[#677D6A] bg-[#F5F5F5] text-[#1A3636] placeholder-[#40534C] focus:outline-none focus:ring-2 focus:ring-[#D6BD98]"
-        />
+    <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-[#1A3636] mb-3">
+          Discover Jakarta's Hidden Gems
+        </h1>
+        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          Explore hundreds of amazing attractions, from cultural sites to modern entertainment venues
+        </p>
       </div>
 
-      {/* Category Filter */}
-      <div className="mb-10">
-        <h2 className="text-3xl font-semibold text-[#1A3636] mb-5">
-          Explore by Categories
-        </h2>
+      {/* Search and Controls Bar */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        {/* Main Search Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-4">
+          <div className="flex-1 relative">
+            <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Search places, categories, or descriptions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-[#1A3636] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1A3636] focus:border-transparent transition-all"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "grid" 
+                  ? "bg-white text-[#1A3636] shadow-sm" 
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Grid3X3 className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "list" 
+                  ? "bg-white text-[#1A3636] shadow-sm" 
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <List className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Advanced Filters Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-colors ${
+              showFilters 
+                ? "bg-[#1A3636] border-[#1A3636] text-white" 
+                : "border-gray-200 text-gray-600 hover:border-[#1A3636]"
+            }`}
+          >
+            <Sliders className="h-5 w-5" />
+            Filters
+          </button>
+        </div>
+
+        {/* Advanced Filters Panel */}
+        {showFilters && (
+          <div className="border-t pt-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Sort Options */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                <div className="flex gap-2">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3636]"
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                    className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3636]"
+                    placeholder="Min"
+                  />
+                  <span className="text-gray-500">-</span>
+                  <input
+                    type="number"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3636]"
+                    placeholder="Max"
+                  />
+                </div>
+              </div>
+
+              {/* Clear Filters */}
+              <div className="flex items-end">
+                <button
+                  onClick={clearFilters}
+                  className="w-full px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Category Pills */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-[#1A3636] mb-4">Categories</h3>
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2 rounded-full border-2 text-sm transition-colors ${
+              className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all duration-200 ${
                 activeCategory === category
-                  ? "bg-[#1A3636] border-[#1A3636] text-white"
-                  : "bg-[#F5F5F5] border-[#D6BD98] text-[#40534C] hover:bg-[#D6BD98]/20"
+                  ? "bg-[#1A3636] border-[#1A3636] text-white shadow-lg"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-[#1A3636] hover:text-[#1A3636]"
               }`}
             >
               {category}
+              {category !== "All" && (
+                <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                  {allPlaces.filter(p => p.category === category).length}
+                </span>
+              )}
             </button>
           ))}
         </div>
       </div>
 
+      {/* Results Summary */}
+      {!isLoading && !error && (
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-gray-600">
+            Showing <span className="font-semibold text-[#1A3636]">{currentDisplayPlaces.length}</span> of{" "}
+            <span className="font-semibold text-[#1A3636]">{sortedPlaces.length}</span> results
+            {searchTerm && (
+              <span className="ml-2">
+                for "<span className="font-medium text-[#1A3636]">{searchTerm}</span>"
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-10">
-          <p className="text-xl text-[#1A3636]">Loading Places...</p>
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader className="animate-spin h-12 w-12 text-[#1A3636] mb-4" />
+          <p className="text-xl text-[#1A3636] font-medium">Loading amazing places...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && !isLoading && (
-        <div className="max-w-2xl mx-auto text-center py-10 p-6 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-          <h3 className="text-2xl font-semibold mb-2">
-            Oops! Something went wrong.
-          </h3>
-          <p>{error}</p>
+        <div className="max-w-2xl mx-auto text-center py-16">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-8">
+            <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <X className="h-8 w-8 text-red-600" />
+            </div>
+            <h3 className="text-2xl font-semibold text-red-800 mb-2">
+              Oops! Something went wrong
+            </h3>
+            <p className="text-red-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Place Cards & No Results */}
+      {/* Places Grid/List */}
       {!isLoading && !error && (
         <>
-          {filteredPlaces.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-xl text-[#40534C]">
-                No Places found matching your criteria.
-              </p>
+          {sortedPlaces.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <SearchIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-600 mb-2">No places found</h3>
+                <p className="text-gray-500 mb-6">
+                  Try adjusting your search terms or filters to find what you're looking for.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-3 bg-[#1A3636] text-white rounded-lg hover:bg-[#2A4A4A] transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {currentDisplayPlaces.map((Place) => (
-                <Link to={`/places/${Place.id}`} key={Place.id}>
-                  <div
-                    className="relative group border-4 border-[#D6BD98] rounded-3xl shadow-xl hover:shadow-2xl shadow-[#1A3636]/30 overflow-hidden transform transition duration-300 hover:scale-105 flex flex-col bg-[#1A3636]"
-                    style={{ minHeight: "320px" }}
-                  >
-                    <img
-                      src={Place.image_url || "/placeholder.svg"}
-                      alt={Place.name}
-                      className="w-full h-60 object-cover object-center"
-                    />
-                    <div className="flex-1 flex flex-col justify-end">
-                      <div className="p-6 bg-[#1A3636] bg-opacity-90 rounded-b-3xl">
-                        <h3 className="text-2xl font-bold text-[#D6BD98] mb-2 text-center drop-shadow-lg">
-                          {Place.name}
-                        </h3>
-                        <p className="text-[#E6FFFA] text-base text-center line-clamp-3">
-                          {Place.description}
-                        </p>
-                        <p className="text-[#D6BD98] text-base text-center font-semibold mt-2">
-                          {typeof Place.price === "number"
-                            ? `Rp ${Place.price.toLocaleString("id-ID")}`
-                            : Place.price}
-                        </p>
+            <>
+              {/* Grid View */}
+              {viewMode === "grid" && (
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {currentDisplayPlaces.map((place) => (
+                    <Link to={`/places/${place.id}`} key={place.id} className="group">
+                      <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:scale-[1.02]">
+                        <div className="relative">
+                          <img
+                            src={place.image_url || "/placeholder.svg"}
+                            alt={place.name}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="absolute top-3 left-3">
+                            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-[#1A3636]">
+                              {place.category}
+                            </span>
+                          </div>
+                          {place.avgRating && (
+                            <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-xs font-medium text-gray-700">
+                                {place.avgRating.toFixed(1)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold text-[#1A3636] mb-2 group-hover:text-[#2A4A4A] transition-colors">
+                            {place.name}
+                          </h3>
+                          <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                            {place.description}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1 text-gray-500">
+                              <MapPin className="h-4 w-4" />
+                              <span className="text-sm">Jakarta</span>
+                            </div>
+                            <div className="text-lg font-semibold text-[#1A3636]">
+                              {typeof place.price === "number" && place.price > 0
+                                ? `Rp ${place.price.toLocaleString("id-ID")}`
+                                : "Free"}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* List View */}
+              {viewMode === "list" && (
+                <div className="space-y-4">
+                  {currentDisplayPlaces.map((place) => (
+                    <Link to={`/places/${place.id}`} key={place.id} className="group">
+                      <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                        <div className="flex">
+                          <img
+                            src={place.image_url || "/placeholder.svg"}
+                            alt={place.name}
+                            className="w-48 h-32 object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1 p-4 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="text-xl font-semibold text-[#1A3636] group-hover:text-[#2A4A4A] transition-colors">
+                                  {place.name}
+                                </h3>
+                                <div className="flex items-center gap-2 ml-4">
+                                  <span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
+                                    {place.category}
+                                  </span>
+                                  {place.avgRating && (
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                      <span className="text-sm font-medium text-gray-700">
+                                        {place.avgRating.toFixed(1)}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                                {place.description}
+                              </p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1 text-gray-500">
+                                <MapPin className="h-4 w-4" />
+                                <span className="text-sm">Jakarta, Indonesia</span>
+                              </div>
+                              <div className="text-xl font-semibold text-[#1A3636]">
+                                {typeof place.price === "number" && place.price > 0
+                                  ? `Rp ${place.price.toLocaleString("id-ID")}`
+                                  : "Free"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
-          {/* Pagination Component */}
-          {totalPages > 1 && (
+          {/* Pagination */}
+          {totalPages > 1 && sortedPlaces.length > 0 && (
             <div className="mt-12 flex justify-center">
               <Pagination>
                 <PaginationContent>
