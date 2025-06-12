@@ -34,7 +34,23 @@ Mengembangkan sistem rekomendasi tempat wisata Jakarta yang dapat:
 
 ### Frontend & Backend
 
-- _[Akan diisi sesuai teknologi yang digunakan]_
+- Machine Learning: 
+TF-IDF (Content-Based Filtering)
+Fitur Ekstraksi Teks & Rekomendasi
+Model Deep Learning untuk Rekomendasi
+Arsitektur dan Pelatihan
+Evaluasi & Penyimpanan Model
+Regresi Linear (Prediksi Usia Pengguna)
+Model Prediktif Umur Berdasarkan Pola Rating
+Persiapan Data
+
+Front-End dan Back-End Developer: 
+UI Design & Mockup
+System Architecture Design : kami merancang arsitektur sistem berbasis client-server yang mencakup frontend (React.js), backend (Node.js/Express), database (PostgreSQL), dan integrasi machine learning. Perancangan ini mencakup alur data, komunikasi antar komponen, serta penggunaan API eksternal.
+Backend Development : menggunakan Node.js dan Express. Data disimpan dan dikelola menggunakan PostgreSQL.
+Frontend Development : dengan React.js yang interaktif dan responsif. Tailwind CSS digunakan untuk mempercepat proses styling, sementara state management diterapkan untuk mengelola data dari API secara real-time.
+API Integration & Testing : frontend dengan backend menggunakan RESTful API dan melakukan pengujian menggunakan Postman untuk memastikan setiap endpoint berfungsi dengan baik, termasuk koneksi ke layanan rekomendasi machine learning.
+Deployment : aplikasi frontend kami deploy menggunakan Netlify, sementara backend di-host secara terpisah. Kami mengatur environment variable dan memastikan aplikasi berjalan lancar setelah peluncuran.
 
 ## 🚀 Quick Start
 
