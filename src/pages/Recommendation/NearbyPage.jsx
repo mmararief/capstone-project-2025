@@ -79,16 +79,6 @@ const MapDisplay = ({ lat, lon }) => {
     navigate(`/places/${place.id}`);
   };
 
-  // Generate mock coordinates for attractions (since API doesn't provide real coordinates)
-  const generateMockCoordinates = (index, baseLatitude, baseLongitude) => {
-    const offsetLat = (Math.sin(index * 2.1) * 0.01) + (Math.random() - 0.5) * 0.008;
-    const offsetLon = (Math.cos(index * 1.7) * 0.01) + (Math.random() - 0.5) * 0.008;
-    return {
-      lat: baseLatitude + offsetLat,
-      lon: baseLongitude + offsetLon
-    };
-  };
-
   if (!lat || !lon) return null;
 
   const mapCenter = [lat, lon];
@@ -141,12 +131,13 @@ const MapDisplay = ({ lat, lon }) => {
             </Marker>
             
             {/* Nearby attractions markers */}
-            {!loading && nearbyPlaces.map((place, index) => {
-              const mockCoords = generateMockCoordinates(index, lat, lon);
+            {!loading && nearbyPlaces.map((place) => {
+              // Gunakan langsung koordinat dari data API
+              if (typeof place.latitude !== 'number' || typeof place.longitude !== 'number') return null;
               return (
                 <Marker 
                   key={place.id} 
-                  position={[mockCoords.lat, mockCoords.lon]} 
+                  position={[place.latitude, place.longitude]} 
                   icon={attractionIcon}
                   eventHandlers={{
                     click: () => handlePlaceClick(place)
