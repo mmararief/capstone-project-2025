@@ -60,4 +60,10 @@ cd FE-BE
 
 ## 👥 Tim Pengembang
 
-_[Tambahkan informasi tim pengembang]_
+(ML) MC009D5Y0680 - Mifta Rizaldirahmat - Universitas Gunadarma - [Aktif]
+(ML) MC009D5Y1029 - Muhammad Naufal Hilmy - Universitas Gunadarma - [Aktif]
+(ML) MC009D5Y0498 - Muhammad Ammar Arief - Universitas Gunadarma - [Aktif]
+(FEBE) FC009D5X2473 - Fayza Kamila - Universitas Gunadarma - [Aktif]
+(FEBE) FC009D5Y1612 - Muhamad Aditya Umar Faiz - Universitas Gunadarma - [Aktif]
+(FEBE) FC009D5Y0580 - Dwiki Diandra Putra - Universitas Gunadarma - [Aktif]
+_
