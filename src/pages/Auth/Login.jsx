@@ -157,12 +157,7 @@ export default function Login() {
               />
               Remember me
             </label>
-            <a
-              href="#" // Ganti dengan link ke halaman lupa password jika ada
-              className="text-[#677D6A] hover:underline font-medium"
-            >
-              Forgot password?
-            </a>
+
           </div>
 
           <button
